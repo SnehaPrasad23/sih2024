@@ -2,6 +2,8 @@
 import './App.css';
 import Home from './pages/Home';
 import {BrowserRouter as Router,Routes,Route, Navigate} from "react-router-dom";
+import Login from './pages/login';
+import Register from './pages/Register';
 
 function App() {
   const user=false;
@@ -17,6 +19,8 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={user?<Navigate to="/"/>:<Home/>}/>
+        <Route path="/login" element={user?<Navigate to="/"/>:<Login/>}/>
+        <Route path="/register" element={user?<Navigate to="/"/>:<Register/>}/>
       </Routes>
     </Router>
   );
