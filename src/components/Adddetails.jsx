@@ -1,21 +1,12 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import styled from "styled-components";
-import axios from "axios";
-// import UploadIcon from '@mui/icons-material/Upload';
-import { Editor } from "@tinymce/tinymce-react";
 
 const PageWrapper = styled.div`
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-`;
-
-const Wrapper = styled.div`
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  padding: 10px 0 70px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 `;
 
 const Container = styled.div`
@@ -29,15 +20,17 @@ const Container = styled.div`
   max-width: 1400px;
   margin: 0 auto;
 `;
+
 const SectionContainer = styled.div`
   display: flex;
   width: 100%;
-  gap: 200px;
+  gap: 20px; /* Reduced gap for better spacing */
 `;
 
 const Section = styled.div`
   flex: 1;
   padding: 0 20px;
+  min-width: 300px;
 `;
 
 const SectionTitle = styled.h3`
@@ -49,6 +42,7 @@ const Container2 = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 15px;
+  width: 100%;
 `;
 
 const LabelContainer = styled.div`
@@ -74,22 +68,29 @@ const InputField = styled.input`
   width: 100%;
 `;
 
+const Wrapper = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 70px;
+`;
+
 const ItemContainer = styled.div`
   width: 100%;
   margin-top: 20px;
-  // padding-bottom: 60px;
 `;
 
 const ItemRow = styled.div`
   display: flex;
   gap: 10px;
   margin-bottom: 10px;
+  flex-wrap: wrap;
 `;
 
 const ItemInput = styled(InputField)`
   flex: 1;
+  min-width: 100px;
 `;
-
 
 const AddItemButton = styled.button`
   background-color: #007bff;
@@ -99,50 +100,70 @@ const AddItemButton = styled.button`
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
+  margin-top: 10px;
 
   &:hover {
     background-color: #0056b3;
   }
 `;
 
+const DeleteButton = styled.button`
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 10px;
+`;
+
 const Adddetails = () => {
   const [address, setAddress] = useState("");
   const [city, setcity] = useState("");
-  const [state, setstate] = useState(null);
-  const [zip, setzip] = useState([]);
-  const [phone, setphone] = useState([]);
-  const [email, setemail] = useState([]);
+  const [state, setstate] = useState("");
+  const [zip, setzip] = useState("");
+  const [phone, setphone] = useState("");
+  const [email, setemail] = useState("");
 
   const [name, setName] = useState("");
   const [companyname, setcompanyName] = useState("");
   const [address2, setAddress2] = useState("");
   const [city2, setcity2] = useState("");
-  const [state2, setstate2] = useState(null);
-  const [zip2, setzip2] = useState([]);
-  const [phone2, setphone2] = useState([]);
+  const [state2, setstate2] = useState("");
+  const [zip2, setzip2] = useState("");
+  const [phone2, setphone2] = useState("");
 
   const [items, setItems] = useState([
     { item: "", description: "", amount: "", cost: "" },
   ]);
-  const itemsEndRef = useRef(null); 
-  // const addItemButtonRef = React.useRef(null);
+  const itemsEndRef = useRef(null);
+
   const handleItemChange = (index, field, value) => {
     const newItems = [...items];
     newItems[index][field] = value;
     setItems(newItems);
   };
+
   const handleAddItem = () => {
     setItems([...items, { item: "", description: "", amount: "", cost: "" }]);
+    window.scrollBy({
+      top: 50, // Adjust this value for scrolling down
+      left: 0,
+      behavior: 'smooth' // Optional: makes the scroll smooth
+  });
   };
-  useEffect(() => {
-    if (items.length > 0) {
-      itemsEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  }, [items.length]);
+  const handleDeleteItem = (index) => {
+    setItems(items.filter((_, i) => i !== index));
+    window.scrollBy({
+      top: -50, // Adjust this value for scrolling down
+      left: 0,
+      behavior: 'smooth' // Optional: makes the scroll smooth
+  });
+  };
 
   return (
     <PageWrapper>
-    <Wrapper>
+      <Wrapper>
       <Container>
         <SectionTitle>INVOICE</SectionTitle>
         <SectionContainer>
@@ -212,7 +233,7 @@ const Adddetails = () => {
               <InputContainer>
                 <InputField
                   type="text"
-                  placeholder="Enter price (in ₹ Rupees)"
+                  placeholder="Enter Phone Number"
                   value={phone}
                   onChange={(e) => setphone(e.target.value)}
                   required
@@ -225,7 +246,7 @@ const Adddetails = () => {
               </LabelContainer>
               <InputContainer>
                 <InputField
-                  type="text"
+                  type="email"
                   placeholder="Enter Email"
                   value={email}
                   onChange={(e) => setemail(e.target.value)}
@@ -328,7 +349,7 @@ const Adddetails = () => {
               <InputContainer>
                 <InputField
                   type="text"
-                  placeholder="Enter price (in ₹ Rupees)"
+                  placeholder="Enter Phone Number"
                   value={phone2}
                   onChange={(e) => setphone2(e.target.value)}
                   required
@@ -337,41 +358,51 @@ const Adddetails = () => {
             </Container2>
           </Section>
         </SectionContainer>
-        <ItemContainer>
-          <SectionTitle>Item Details</SectionTitle>
-          {items.map((item, index) => (
-            <ItemRow key={index}>
-              <ItemInput
-                type="text"
-                placeholder="Item"
-                value={item.item}
-                onChange={(e) => handleItemChange(index, 'item', e.target.value)}
-              />
-              <ItemInput
-                type="text"
-                placeholder="Description"
-                value={item.description}
-                onChange={(e) => handleItemChange(index, 'description', e.target.value)}
-              />
-              <ItemInput
-                type="text"
-                placeholder="Amount"
-                value={item.amount}
-                onChange={(e) => handleItemChange(index, 'amount', e.target.value)}
-              />
-              <ItemInput
-                type="text"
-                placeholder="Cost"
-                value={item.cost}
-                onChange={(e) => handleItemChange(index, 'cost', e.target.value)}
-              />
-            </ItemRow>
-          ))}
-          <div ref={itemsEndRef} />
-          <AddItemButton onClick={handleAddItem} >Add Item</AddItemButton>
-        </ItemContainer>
       </Container>
-    </Wrapper>
+      </Wrapper>
+
+      <Wrapper>
+        <Container>
+      <ItemContainer>
+        <SectionTitle>Item Details</SectionTitle>
+        {items.map((item, index) => (
+          <ItemRow key={index}>
+            <ItemInput
+              type="text"
+              placeholder="Item"
+              value={item.item}
+              onChange={(e) => handleItemChange(index, 'item', e.target.value)}
+              required
+            />
+            <ItemInput
+              type="text"
+              placeholder="Description"
+              value={item.description}
+              onChange={(e) => handleItemChange(index, 'description', e.target.value)}
+              required
+            />
+            <ItemInput
+              type="number"
+              placeholder="Amount"
+              value={item.amount}
+              onChange={(e) => handleItemChange(index, 'amount', e.target.value)}
+              required
+            />
+            <ItemInput
+              type="number"
+              placeholder="Cost"
+              value={item.cost}
+              onChange={(e) => handleItemChange(index, 'cost', e.target.value)}
+              required
+            />
+            <DeleteButton onClick={() => handleDeleteItem(index)}>Delete</DeleteButton>
+          </ItemRow>
+        ))}
+        <div ref={itemsEndRef} />
+        <AddItemButton onClick={handleAddItem}>Add Item</AddItemButton>
+      </ItemContainer>
+      </Container>
+      </Wrapper>
     </PageWrapper>
   );
 };
